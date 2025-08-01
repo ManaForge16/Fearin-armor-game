@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Fearin: Within the Shell</title>
+  <style>
+    body {
+      background-color: #000;
+      color: #0f0;
+      font-family: 'Courier New', monospace;
+      margin: 0;
+      padding: 20px;
+      overflow: hidden;
+    }
+    #game {
+      max-width: 800px;
+      margin: auto;
+      white-space: pre-line;
+    }
+    #sanityBar {
+      width: 100%;
+      height: 20px;
+      background-color: #333;
+      border: 1px solid #0f0;
+      margin-bottom: 20px;
+    }
+    #sanityInner {
+      height: 100%;
+      background-color: #0f0;
+      width: 100%;
+      transition: width 0.3s;
+    }
+    .btn {
+      background-color: #0f0;
+      color: #000;
+      font-weight: bold;
+      padding: 10px;
+      margin: 10px 5px 0 0;
+      border: none;
+      cursor: pointer;
+      font-family: monospace;
+    }
+    .btn:hover {
+      background-color: #0a0;
+    }
+  </style>
+</head>
+<body>
+  <div id="game">
+    <h1>Fearin: Within the Shell</h1>
+    <div id="sanityBar"><div id="sanityInner"></div></div>
+    <div id="output">You awaken within a shell made of grade six Fearin. Fear is your only guide.
+    </div>
+    <div id="choices"></div>
+  </div>
+
+  <script>
+    const output = document.getElementById("output");
+    const choices = document.getElementById("choices");
+    const sanityBar = document.getElementById("sanityInner");
+
+    let sanity = 100;
+    let scene = 0;
+
+    const scenes = [
+      {
+        text: "A corridor stretches out before you, shadows shifting unnaturally.",
+        options: [
+          { text: "Walk through", sanityLoss: 5 },
+          { text: "Inspect the shadows", sanityLoss: 10 }
+        ]
+      },
+      {
+        text: "A mirror stands in the darkness. Your reflection does not move.",
+        options: [
+          { text: "Touch the mirror", sanityLoss: 15 },
+          { text: "Look away", sanityLoss: 5 }
+        ]
+      },
+      {
+        text: "You hear whispering coming from two doors.",
+        options: [
+          { text: "Enter the left door", sanityLoss: 10 },
+          { text: "Enter the right door", sanityLoss: 20 }
+        ]
+      },
+      {
+        text: "The shell pulses. You feel transported through shadows.",
+        options: [
+          { text: "Hold your breath", sanityLoss: 5 },
+          { text: "Scream", sanityLoss: 30 }
+        ]
+      }
+    ];
+
+    function updateSanity(amount) {
+      sanity -= amount;
+      if (sanity < 0) sanity = 0;
+      sanityBar.style.width = sanity + "%";
+    }
+
+    function gameOver() {
+      output.textContent = "Your mind shatters under the weight of Fearin. Game over.";
+      choices.innerHTML = '';
+    }
+
+    function renderScene() {
+      if (sanity <= 0) {
+        gameOver();
+        return;
+      }
+      if (scene >= scenes.length) {
+        output.textContent = "You emerge from the shell. You survived Fearin. Barely.";
+        choices.innerHTML = '';
+        return;
+      }
+
+      const current = scenes[scene];
+      output.textContent = current.text;
+      choices.innerHTML = '';
+
+      current.options.forEach((opt, index) => {
+        const btn = document.createElement("button");
+        btn.textContent = opt.text;
+        btn.className = "btn";
+        btn.onclick = () => {
+          updateSanity(opt.sanityLoss);
+          scene++;
+          renderScene();
+        };
+        choices.appendChild(btn);
+      });
+    }
+
+    renderScene();
+  </script>
+</body>
+</html>
